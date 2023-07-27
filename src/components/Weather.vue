@@ -70,7 +70,7 @@ export default {
 		}
 	},
 	async created() {
-		const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${this.city}&units=metric&appid=e43dadbcd81047dbcb580f957c87f972`);
+		const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${this.city}&units=metric&appid=${process.env.VUE_APP_OPENWEATHERMAP_KEY}`);
 		const weatherData = response.data;
 		this.temperature = Math.round(weatherData.main.temp);
 		this.feelsLike = Math.round(weatherData.main.feels_like);
@@ -83,7 +83,7 @@ export default {
 		this.time = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
 		this.name = weatherData.name;
 		this.country = weatherData.sys.country;
-		console.log(weatherData.name);
+		console.log(weatherData);
 	}
 }
 </script>
