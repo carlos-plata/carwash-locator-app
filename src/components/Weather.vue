@@ -30,10 +30,11 @@
 						</tr>
 					</tbody>
 				</table>
-				<ForecastWeather></ForecastWeather>
+				<ForecastWeather :city="city"></ForecastWeather>
 				<div class="d-flex m-3 justify-content-center" id="div_Form">
 					<form action="">
-						<input type="button" value="Change Location" class="btn change-btn btn-primary">
+						<input type="button" value="Change Location" @click="changeLocation"
+							class="btn change_btn btn-primary">
 					</form>
 				</div>
 			</div>
@@ -42,8 +43,8 @@
 </template>
 
 <script>
-import axios from 'axios';
 //importing components
+import axios from 'axios';
 import ForecastWeather from './ForecastWeather.vue';
 
 export default {
@@ -68,22 +69,29 @@ export default {
 			name: null,
 			country: null
 		}
+	}, methods: {
+		changeLocation() {
+			window.location.reload();
+		}
 	},
 	async created() {
-		const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${this.city}&units=metric&appid=${process.env.VUE_APP_OPENWEATHERMAP_KEY}`);
-		const weatherData = response.data;
-		this.temperature = Math.round(weatherData.main.temp);
-		this.feelsLike = Math.round(weatherData.main.feels_like);
-		this.tempMin = Math.round(weatherData.main.temp_min);
-		this.tempMax = Math.round(weatherData.main.temp_max);
-		this.description = weatherData.weather[0].description;
-		this.iconUrl = `https://api.openweathermap.org/img/w/${weatherData.weather[0].icon}.png`;
-		this.date = new Date().toLocaleDateString();
-		const d = new Date();
-		this.time = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-		this.name = weatherData.name;
-		this.country = weatherData.sys.country;
-		console.log(weatherData);
+		await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${this.city}&units=metric&appid=${process.env.VUE_APP_OPENWEATHERMAP_KEY}`).then((response) => {
+			this.temperature = Math.round(response.data.main.temp);
+			this.feelsLike = Math.round(response.data.main.feels_like);
+			this.tempMin = Math.round(response.data.main.temp_min);
+			this.tempMax = Math.round(response.data.main.temp_max);
+			this.description = response.data.weather[0].description;
+			this.iconUrl = `https://api.openweathermap.org/img/w/${response.data.weather[0].icon}.png`;
+			this.date = new Date().toLocaleDateString();
+			const d = new Date();
+			this.time = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+			this.name = response.data.name;
+			this.country = response.data.sys.country;
+		}).catch((error) => {
+			this.errors = error;
+			console.error(error);
+			this.loading = false;
+		});
 	}
 }
 </script>
