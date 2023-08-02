@@ -27,7 +27,7 @@ export default {
 		initMap() {
 			console.log("Latitude : " + this.latitude + " Longitude: " + this.longitude + ", CITY: " + this.city);
 			const loader = new Loader({
-				apiKey: "AIzaSyBMy8bWA8Bielkpn5-mLxnIpt683DZrHUs",
+				apiKey: `${process.env.VUE_APP_GOOGLEMAPS_KEY}`,
 				version: "weekly",
 			});
 			loader.load().then(async () => {
