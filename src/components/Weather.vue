@@ -1,43 +1,42 @@
 <template>
-	<div class="container p-0">
-		<div class="d-flex">
-			<div class="card main-div w-100">
-				<div class="p-3">
-					<h2 class="mb-1 day">Today</h2>
-					<p class="text-light date mb-0">{{ date }}</p>
-					<small>{{ time }}</small>
-					<h2 class="place"><i class="fa fa-location">{{ name }} <small>{{ country }}</small></i></h2>
-					<div class="temp">
-						<h1 class="weather-temp">{{ temperature }}&deg;</h1>
-						<h2 class="text-light">{{ description }} <img :src="iconUrl"></h2>
-					</div>
+	<div class="card main-div w-100 p-3 ">
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<h3 class="mb-1 day">Today</h3>
+					<h3>{{ date }}</h3>
+					<h3>{{ time }}</h3>
+					<h3 class="place"><i class="fa fa-location"></i> {{ name }} <small>{{ country }}</small></h3>
+				</div>
+				<div class="col temp">
+					<h4 class="weather-temp">{{ temperature }}&deg;</h4>
+					<h4 class="text-light">{{ description }} <img :src="iconUrl"></h4>
 				</div>
 			</div>
-			<div class="card-2 w-100">
-				<table class="m-4">
-					<tbody>
-						<tr>
-							<th>Feels like:</th>
-							<td>{{ feelsLike }}&deg;</td>
-						</tr>
-						<tr>
-							<th>Min:</th>
-							<td>{{ tempMin }}&deg;</td>
-						</tr>
-						<tr>
-							<th>Max</th>
-							<td>{{ tempMax }}&deg;</td>
-						</tr>
-					</tbody>
-				</table>
-				<ForecastWeather :city="city"></ForecastWeather>
-				<div class="d-flex m-3 justify-content-center" id="div_Form">
-					<form action="">
-						<input type="button" value="Change Location" @click="changeLocation"
-							class="btn change_btn btn-primary">
-					</form>
-				</div>
-			</div>
+		</div>
+	</div>
+	<div class="card-2 w-100">
+		<table class="m-4">
+			<tbody>
+				<tr>
+					<th>Feels like:</th>
+					<td>{{ feelsLike }}&deg;</td>
+				</tr>
+				<tr>
+					<th>Min:</th>
+					<td>{{ tempMin }}&deg;</td>
+				</tr>
+				<tr>
+					<th>Max</th>
+					<td>{{ tempMax }}&deg;</td>
+				</tr>
+			</tbody>
+		</table>
+		<ForecastWeather :city="city"></ForecastWeather>
+		<div class="d-flex m-3 justify-content-center" id="div_Form">
+			<form action="">
+				<input type="button" value="Change Location" @click="changeLocation" class="btn change_btn btn-primary">
+			</form>
 		</div>
 	</div>
 </template>
@@ -54,6 +53,8 @@ export default {
 	},
 	props: {
 		city: String,
+		latitude: Number,
+		longitude: Number,
 
 	},
 	data() {
@@ -75,7 +76,7 @@ export default {
 		}
 	},
 	async created() {
-		await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${this.city}&units=metric&appid=${process.env.VUE_APP_OPENWEATHERMAP_KEY}`).then((response) => {
+		await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${this.latitude}&lon=${this.longitude}&units=metric&appid=${process.env.VUE_APP_OPENWEATHERMAP_KEY}`).then((response) => {
 			this.temperature = Math.round(response.data.main.temp);
 			this.feelsLike = Math.round(response.data.main.feels_like);
 			this.tempMin = Math.round(response.data.main.temp_min);
@@ -126,12 +127,18 @@ h2.mb-1.day {
 .temp {
 	position: absolute;
 	bottom: 0;
+	text-align: right;
 }
 
 .main-div:hover {
 	transform: scale(1.1);
 	transition: transform 0.5s ease;
 	z-index: 1;
+}
+
+.card-temp {
+	background-color: transparent;
+	border: 0;
 }
 
 .card-2 {
