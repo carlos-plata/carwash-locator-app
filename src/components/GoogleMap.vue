@@ -23,6 +23,7 @@ export default {
 	},
 	mounted() {
 		this.initMap();
+		this.findPlaces(this.map);
 	}, methods: {
 		initMap() {
 			console.log("Latitude : " + this.latitude + " Longitude: " + this.longitude + ", CITY: " + this.city);
@@ -34,9 +35,35 @@ export default {
 				const { Map } = await window.google.maps.importLibrary("maps");
 				this.map = new Map(document.getElementById("map"), {
 					center: { lat: this.latitude, lng: this.longitude },
-					zoom: 16,
+					zoom: 12,
 					mapTypeId: "roadmap",
 				});
+			});
+		},
+		async findPlaces(map) {
+			const request = {
+				query: "car wash",
+				fields: ["name", "geometry"],
+			};
+
+			const { PlacesService } = await window.google.maps.importLibrary("places");
+			const service = new PlacesService(new window.google.maps.Map(document.getElementById("map")));
+			service.findPlaceFromQuery(request, (results, status) => {
+				if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
+					for (let i = 0; i < results.length; i++) {
+						if (!results[i].geometry || !results[i].geometry.location) return;
+						console.log(results[i]);
+						const marker = new window.google.maps.Marker({
+							map: this.map, position: results[i].geometry.location,
+						});
+						window.google.maps.event.addListener(marker, "click", () => {
+							window.google.maps.infowindow.setContent(results[i].name || "");
+							window.google.maps.infowindow.open(map);
+						});
+					}
+
+					this.map.setCenter(results[0].geometry.location);
+				}
 			});
 		}
 	}
