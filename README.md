@@ -9,10 +9,6 @@ VUE_APP_GOOGLEMAPS_KEY
 ```
 npm install
 ```
-## Project setup
-```
-npm install
-```
 
 ### Compiles and hot-reloads for development
 ```
