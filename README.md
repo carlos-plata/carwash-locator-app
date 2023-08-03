@@ -1,5 +1,14 @@
-# carwash-locator-app
+# Store Locator app - Vue.js
 
+## env variables in .env file
+```
+VUE_APP_OPENWEATHERMAP_KEY
+VUE_APP_GOOGLEMAPS_KEY
+```
+## Project setup
+```
+npm install
+```
 ## Project setup
 ```
 npm install

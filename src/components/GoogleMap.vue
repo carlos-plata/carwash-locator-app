@@ -5,6 +5,7 @@
 <script>
 //importing components
 import { Loader } from "@googlemaps/js-api-loader";
+
 //App definition
 export default {
 	name: 'GoogleMap',
@@ -23,10 +24,9 @@ export default {
 	},
 	mounted() {
 		this.initMap();
-		this.findPlaces(this.map);
+		this.findPlaces();
 	}, methods: {
 		initMap() {
-			console.log("Latitude : " + this.latitude + " Longitude: " + this.longitude + ", CITY: " + this.city);
 			const loader = new Loader({
 				apiKey: `${process.env.VUE_APP_GOOGLEMAPS_KEY}`,
 				version: "weekly",
@@ -35,24 +35,23 @@ export default {
 				const { Map } = await window.google.maps.importLibrary("maps");
 				this.map = new Map(document.getElementById("map"), {
 					center: { lat: this.latitude, lng: this.longitude },
-					zoom: 12,
+					zoom: 14,
 					mapTypeId: "roadmap",
 				});
 			});
 		},
 		async findPlaces(map) {
 			const request = {
-				query: "car wash",
+				query: "pharmacy",
 				fields: ["name", "geometry"],
 			};
 
 			const { PlacesService } = await window.google.maps.importLibrary("places");
 			const service = new PlacesService(new window.google.maps.Map(document.getElementById("map")));
-			service.findPlaceFromQuery(request, (results, status) => {
+			service.textSearch(request, (results, status) => {
 				if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
 					for (let i = 0; i < results.length; i++) {
 						if (!results[i].geometry || !results[i].geometry.location) return;
-						console.log(results[i]);
 						const marker = new window.google.maps.Marker({
 							map: this.map, position: results[i].geometry.location,
 						});
@@ -61,13 +60,12 @@ export default {
 							window.google.maps.infowindow.open(map);
 						});
 					}
-
-					this.map.setCenter(results[0].geometry.location);
 				}
 			});
 		}
 	}
 }
+
 </script>
 
 <style>
