@@ -140,7 +140,6 @@ export default {
 										directionsLink.addEventListener('click', () => {
 											this.getDirections(destination);
 											infoWindow.close();
-											console.log("Attaching listener to directions link.");
 										});
 									}
 									infoWindow.setContent(contentElement);
@@ -158,8 +157,6 @@ export default {
 			});
 		},
 		getDirections(destination) {
-			console.log("Get Directions clicked for destination:", destination);
-			this.currentDestination = destination;
 			const startIcon = {
 				path: window.google.maps.SymbolPath.CIRCLE,
 				fillColor: "#00FF00",
@@ -231,7 +228,51 @@ export default {
 			} else {
 				alert('Geolocation is not supported by this browser.');
 			}
+
+			this.startDriving(destination);
 		},
+		startDriving(destination) {
+			// Check if the button already exists in the DOM
+			const existingButton = document.querySelector('.map-start-driving-control');
+
+			const controlDiv = document.createElement('div');
+			controlDiv.classList.add('map-start-driving-control');
+
+			const controlBtn = document.createElement('button');
+			controlBtn.innerHTML = 'Start Driving';
+			controlBtn.classList.add('start-driving-button');
+			controlDiv.appendChild(controlBtn);
+
+			let activeBtn; // Introduced variable to keep track of the button that will be attached the event listener
+
+			if (!existingButton) {
+				// If there's no existing button, add the new button to the map controls
+				if (this.map) {
+					this.map.controls[window.google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
+				}
+				activeBtn = controlBtn;
+			} else {
+				// If there's an existing button, remove its previous event listeners
+				const oldElem = existingButton.querySelector('.start-driving-button');
+				const newElem = oldElem.cloneNode(true);
+				existingButton.replaceChild(newElem, oldElem);
+				activeBtn = newElem; // Point to the new button element for the click event below
+			}
+
+			activeBtn.addEventListener('click', function () {
+				const latValue = (typeof destination.lat === 'function') ? destination.lat() : destination.lat;
+				const lngValue = (typeof destination.lng === 'function') ? destination.lng() : destination.lng;
+
+				if (latValue && lngValue) {
+					const destinationURL = `https://www.google.com/maps/dir/?api=1&destination=${latValue},${lngValue}`;
+					window.open(destinationURL, '_blank');
+				} else {
+					alert("Please select a destination first!");
+				}
+			});
+		}
+
+
 	}
 }
 </script>
