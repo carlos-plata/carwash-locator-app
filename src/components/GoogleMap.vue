@@ -1,15 +1,10 @@
 <template>
 	<div class="tooltip" ref="tooltip">Use two fingers to move the map</div>
-	<div class="controls-container">
-		<button class="start-driving-button" ref="driveButton" v-if="showDriveButton" @click="startDriving">Start
-			Driving</button>
-	</div>
 	<div id="map"></div>
 </template>
 
 <script>
 import { Loader } from "@googlemaps/js-api-loader";
-import moment from 'moment'
 
 export default {
 	name: 'GoogleMap',
@@ -22,10 +17,7 @@ export default {
 		return {
 			map: null,
 			directionsRenderer: null,
-			showDriveButton: false,
 			currentDestination: null,
-			zoomButton: null,
-			startDrivingControl: null
 		};
 	},
 	mounted() {
@@ -108,9 +100,6 @@ export default {
 									let weeklyHours = '';
 
 									if (place.opening_hours) {
-										console.log(place.opening_hours);
-										const today = moment().day() - 1;
-										console.log(today);
 										weeklyHours = place.opening_hours.weekday_text.join('<br>');
 									}
 
@@ -150,18 +139,10 @@ export default {
 									if (directionsLink) {
 										directionsLink.addEventListener('click', () => {
 											this.getDirections(destination);
-											infoWindow.close(() => {
-												if (this.startDrivingControl) {
-													const controlIndex = this.map.controls[window.google.maps.ControlPosition.TOP_RIGHT].getArray().indexOf(this.startDrivingControl);
-													if (controlIndex !== -1) {
-														this.map.controls[window.google.maps.ControlPosition.TOP_RIGHT].removeAt(controlIndex);
-													}
-													this.startDrivingControl = null;
-												}
-											});
+											infoWindow.close();
+											console.log("Attaching listener to directions link.");
 										});
 									}
-
 									infoWindow.setContent(contentElement);
 									infoWindow.open(this.map, marker);
 									infoWindow.isOpen = true;
@@ -177,6 +158,7 @@ export default {
 			});
 		},
 		getDirections(destination) {
+			console.log("Get Directions clicked for destination:", destination);
 			this.currentDestination = destination;
 			const startIcon = {
 				path: window.google.maps.SymbolPath.CIRCLE,
@@ -249,37 +231,7 @@ export default {
 			} else {
 				alert('Geolocation is not supported by this browser.');
 			}
-			this.directionsRenderer.addListener('directions_changed', () => {
-				if (!this.startDrivingControl) {
-					const zoomButton = document.createElement('button');
-					zoomButton.innerText = "Start Driving";
-					zoomButton.className = "start-driving-button";
-					zoomButton.onclick = () => {
-						this.map.setZoom(16);
-						this.map.setCenter(destination);
-					};
-					this.startDrivingControl = zoomButton;  // store the button reference
-
-					this.map.controls[window.google.maps.ControlPosition.TOP_RIGHT].push(zoomButton);
-				}
-			});
-
-			if (this.startDrivingControl) {  // Check if startDrivingControl exists
-				// Update the existing button's click handler if it's a different destination
-				this.startDrivingControl.onclick = () => {
-					this.map.setZoom(16);
-					this.map.setCenter(destination);
-
-				}
-			}
-			this.showDriveButton = true;
 		},
-		startDriving() {
-			if (this.currentDestination) {
-				this.map.setZoom(16);
-				this.map.setCenter(this.currentDestination);
-			}
-		}
 	}
 }
 </script>
@@ -338,7 +290,7 @@ body {
 .infowindow-address {
 	display: flex;
 	align-items: center;
-	margin-top: 8px;
+	margin-top: 2px;
 	color: #777;
 	font-size: 0.9em;
 }
@@ -346,7 +298,7 @@ body {
 .infowindow-hours {
 	display: flex;
 	align-items: center;
-	margin-top: 8px;
+	margin-top: 2px;
 	color: #555;
 	font-size: 0.9em;
 }
@@ -354,19 +306,17 @@ body {
 .infowindow-rating {
 	display: flex;
 	align-items: center;
-	margin-top: 8px;
+	margin-top: 2px;
 	color: #555;
 	font-size: 0.9em;
 }
 
 .infowindow-section {
-	margin-bottom: 8px;
-	/* Spacing between sections */
+	margin-bottom: 2px;
 }
 
 .infowindow-section p {
-	margin-top: 4px;
-	/* Spacing between the title and content of each section */
+	margin-top: 2px;
 }
 
 .material-icons {
@@ -416,13 +366,6 @@ body {
 	/* Ensure full opacity */
 }
 
-.controls-container {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	z-index: 2;
-}
-
 .tooltip {
 	position: absolute;
 	bottom: 10%;
@@ -439,4 +382,5 @@ body {
 	/* Initially hidden */
 	transition: opacity 0.3s ease;
 	/* Smooth fade effect */
-}</style>
+}
+</style>
